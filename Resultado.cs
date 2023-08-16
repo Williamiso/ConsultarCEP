@@ -20,7 +20,8 @@ namespace ConsultarCEP
         [JsonProperty(PropertyName = "localidade")]
         public string Localidade { get; set; }
 
-       
+        [JsonProperty(PropertyName = "UF")]
+        public string UF { get; set; }
 
 
     }

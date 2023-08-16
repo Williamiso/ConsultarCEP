@@ -1,3 +1,6 @@
+using Newtonsoft.Json;
+using System.Net.Http;
+
 namespace ConsultarCEP
 {
     public partial class FrmConsultarCEP : Form
@@ -182,7 +185,36 @@ namespace ConsultarCEP
         {
             if( string.IsNullOrEmpty( txtCEP.Text ))
             {
-                MessageBox.Show("Informe um CEP válido!", Text, MessageBoxButtons.OK);
+                MessageBox.Show("Informe um CEP válido!", Text,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            else
+            {
+                string strURL = string.Format("https://viacep.com.br/ws/{0}/json/", txtCEP.Text.Trim());
+
+                try
+                {
+                    using (HttpClient client = new HttpClient())
+                    {
+                        var response = client.GetAsync(strURL).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var result = response.Content.ReadAsStringAsync().Result;
+                            Resultado res = JsonConvert.DeserializeObject<Resultado>(result);
+
+                            txtEstado.Text = res.UF;
+                            txtCidade.Text = res.Localidade;
+                            txtBairro.Text = res.Bairro;
+                            txtLogradouro.Text = res.Logradouro;
+
+                        }
+                    }
+                }
+                catch ( Exception ex )
+                {
+                    MessageBox.Show(ex.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
 
         }
